@@ -1,0 +1,1 @@
+# Marks the backend directory as a Python package for reliable module imports in production.

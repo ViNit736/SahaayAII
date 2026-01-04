@@ -10,16 +10,31 @@ from fastapi import UploadFile, File
 from pypdf import PdfReader
 import io
 
-# Load environment variables
-env_path = Path(__file__).resolve().parent.parent / '.ENV'
-load_dotenv(dotenv_path=env_path)
+# Load environment variables (.env or .ENV)
+root_dir = Path(__file__).resolve().parent.parent
+for fname in ('.env', '.ENV'):
+    env_path = root_dir / fname
+    if env_path.exists():
+        load_dotenv(dotenv_path=env_path)
+        break
 
 app = FastAPI()
 
 # CORS
+allowed_origins_env = os.getenv("CORS_ALLOW_ORIGINS")
+if allowed_origins_env:
+    origins = [o.strip() for o in allowed_origins_env.split(",") if o.strip()]
+else:
+    origins = [
+        "https://sahaayai-fcce8.web.app",
+        "https://sahaayai-fcce8.firebaseapp.com",
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:5500",
+    ]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -108,7 +123,8 @@ Keep JSON field keys (like "analysis_mode") in English, but translate the VALUES
         response = model.generate_content(prompt)
         
         # Clean response text to ensure valid JSON
-        print(f"DEBUG: Raw AI Response: {response.text}")
+        if os.getenv("DEBUG") == "1":
+            print(f"DEBUG: Raw AI Response: {response.text}")
         response_text = response.text.strip()
         if response_text.startswith("```json"):
             response_text = response_text[7:]
@@ -118,12 +134,17 @@ Keep JSON field keys (like "analysis_mode") in English, but translate the VALUES
         if response_text.endswith("```"):
             response_text = response_text[:-3]
             
-        result = json.loads(response_text.strip())
+        try:
+            result = json.loads(response_text.strip())
+        except json.JSONDecodeError as e:
+            raise HTTPException(status_code=502, detail=f"Invalid JSON from model: {str(e)}")
         return result
         
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Error processing request: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.post("/suggest-fix")
 async def suggest_fix(request: AnalyzeRequest):
@@ -154,12 +175,17 @@ async def parse_pdf(file: UploadFile = File(...)):
         reader = PdfReader(pdf_file)
         text = ""
         for page in reader.pages:
-            text += page.extract_text() + "\n"
+            extracted = page.extract_text() or ""
+            text += extracted + "\n"
         
         return {"text": text}
     except Exception as e:
         print(f"Error parsing PDF: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to parse PDF")
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
 
 if __name__ == "__main__":
     import uvicorn

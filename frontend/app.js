@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const actionSteps = document.getElementById('actionSteps');
   const analyzeBtn = document.getElementById('analyzeBtn');
 
-  const API_URL = 'http://localhost:8000';
+  const API_URL = 'https://sahaayai.onrender.com';
 
   function setStatus(type, message) {
     const icons = {
