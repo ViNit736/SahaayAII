@@ -5,7 +5,7 @@ import os
 import json
 from pathlib import Path
 from dotenv import load_dotenv
-from models import AnalyzeRequest, AnalysisResponse, DocumentResponse, ScamResponse
+from .models import AnalyzeRequest, AnalysisResponse, DocumentResponse, ScamResponse
 from fastapi import UploadFile, File
 from pypdf import PdfReader
 import io
