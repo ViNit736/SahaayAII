@@ -923,6 +923,9 @@
       };
 
       // File Upload Handler
+      // CONFIGURATION
+      const API_BASE_URL = 'http://localhost:8000'; // ⚠️ REPLACE THIS with your Render/Production backend URL after deployment
+
       const handleFileUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -936,7 +939,7 @@
           formData.append('file', file);
 
           try {
-            const res = await fetch('http://localhost:8000/parse-pdf', {
+            const res = await fetch(`${API_BASE_URL}/parse-pdf`, {
               method: 'POST',
               body: formData
             });
@@ -982,7 +985,7 @@
             if (prev >= processingMessages.length - 1) return prev;
             return prev + 1;
           });
-        }, 800);
+        }, 800);`${API_BASE_URL}`
 
         try {
           const response = await fetch('http://localhost:8000/analyze', {
