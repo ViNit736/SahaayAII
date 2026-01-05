@@ -924,7 +924,7 @@
 
       // File Upload Handler
       // CONFIGURATION
-      const API_BASE_URL = 'http://localhost:8000'; // ⚠️ REPLACE THIS with your Render/Production backend URL after deployment
+      const API_BASE_URL = 'https://sahaayai.onrender.com'; // ⚠️ REPLACE THIS with your Render/Production backend URL after deployment
 
       const handleFileUpload = async (e) => {
         const file = e.target.files[0];
@@ -988,7 +988,7 @@
         }, 800);`${API_BASE_URL}`
 
         try {
-          const response = await fetch('http://localhost:8000/analyze', {
+          const response = await fetch(`${API_BASE_URL}/analyze`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
