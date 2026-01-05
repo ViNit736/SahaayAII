@@ -1294,7 +1294,7 @@
                   <span>Analysis History</span>
                 </div>
                 <div className="ai-panel-body ai-history-list">
-                  {history.length === 0 && <p style={{ color: '#94a3b8', textAlign: 'center', padding: '1rem' }}>No history yet.</p>}
+                  {history.length === 0 && <p style={{ color: '#94a3b8', textAlign: 'center', padding: '1rem' }}>Any documents or messages you analyze in this tab will appear here temporarily, just for your current session..</p>}
                   {history.map(item => (
                     <div key={item.id} className="ai-history-item" onClick={() => { setInput(item.input); setResult(item.result); }} title="Reopen analysis">
                       <div className={`ai-history-risk ai-risk-${item.risk === 'HIGH' ? 'high' : 'low'}`}></div>
